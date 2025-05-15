@@ -1,0 +1,54 @@
+from telegram.ext import Application, MessageHandler, filters
+from telegram import Update
+from telegram.ext import ContextTypes
+
+# Token do seu bot
+TOKEN = '7651883636:AAE5sCD0J5JmaYqmTzPKs3MC5sqtzl1HArM'
+
+# Função para criar o texto do anúncio
+async def criar_anuncio(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    mensagem = update.message.text
+
+    if all(campo in mensagem.lower() for campo in ["nome:", "descricao:", "preco:", "link:"]):
+        linhas = mensagem.split('\n')
+        dados = {}
+        for linha in linhas:
+            if ':' in linha:
+                chave, valor = linha.split(':', 1)
+                dados[chave.strip().lower()] = valor.strip()
+
+        nome = dados.get("nome", "Produto incrível")
+        descricao = dados.get("descricao", "Descrição não informada.")
+        preco = dados.get("preco", "Preço não disponível")
+        link = dados.get("link", "Link não disponível")
+
+        anuncio = f"""📸 [Imagem do produto]
+@achhadinhos_mil
+
+😲 Preço de cair o queixo! Corre que vai acabar!
+
+🔥 {nome} – {descricao}
+
+💰 Por apenas R$ {preco} 😱
+
+🛒 Compre agora 👉 {link}
+
+⚠️ Promoção sujeita à alteração de preço e estoque do site"""
+        await update.message.reply_text(anuncio)
+    else:
+        await update.message.reply_text(
+            "Por favor, envie a mensagem no seguinte formato:\n\n"
+            "nome: Nome do produto\n"
+            "descricao: Breve descrição\n"
+            "preco: 29.90\n"
+            "link: https://exemplo.com/produto"
+        )
+
+# Função principal
+def main():
+    application = Application.builder().token(TOKEN).build()
+    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, criar_anuncio))
+    application.run_polling()
+
+if __name__ == '__main__':
+    main()
